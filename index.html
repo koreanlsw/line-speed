@@ -8,19 +8,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
   :root{
-    --bg:#eef1f4;
-    --surface:#ffffff;
-    --surface-2:#e4e9ee;
-    --border:#d3dae1;
-    --text:#141a20;
-    --text-dim:#5b6874;
-    --accent:#0e8f5c;
-    --accent-dim:#0e8f5c33;
-    --accent-ink:#ffffff;
-    --warn:#b8791a;
-    --danger:#c0392b;
+    --bg:#eef1f4; --surface:#ffffff; --surface-2:#e4e9ee; --border:#d3dae1;
+    --text:#141a20; --text-dim:#5b6874;
+    --accent:#0e8f5c; --accent-dim:#0e8f5c33; --accent-ink:#ffffff;
+    --warn:#b8791a; --danger:#c0392b;
     --mono:'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
-    --sans:'Inter', system-ui, -apple-system, sans-serif;
+    --sans:'Inter', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
@@ -40,11 +33,11 @@
   body{margin:0;color:var(--text);font-family:var(--sans);-webkit-tap-highlight-color:transparent;}
   .wrap{max-width:560px;margin:0 auto;padding:14px 14px 40px;display:flex;flex-direction:column;gap:12px;}
 
-  header{display:flex;align-items:baseline;justify-content:space-between;padding:4px 2px 2px;}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 2px 2px;}
   header h1{font-size:15px;font-weight:700;letter-spacing:0.02em;margin:0;}
   header .sub{font-size:11px;color:var(--text-dim);font-family:var(--mono);}
 
-  .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);letter-spacing:0.03em;padding:4px 9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);letter-spacing:0.03em;padding:4px 9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);white-space:nowrap;}
   .status-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim);flex:none;}
   .status-pill.live{color:var(--accent);border-color:var(--accent-dim);background:var(--accent-dim);}
   .status-pill.live .dot{background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);animation:pulse 1.6s ease-in-out infinite;}
@@ -53,32 +46,37 @@
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
   @media (prefers-reduced-motion: reduce){.status-pill.live .dot{animation:none;}}
 
-  .mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:4px;}
-  .mode-tabs button{border:0;background:transparent;color:var(--text-dim);font-family:var(--sans);font-weight:700;font-size:13px;padding:9px;border-radius:8px;cursor:pointer;}
-  .mode-tabs button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.12);}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:4px;}
+  .seg button{border:0;background:transparent;color:var(--text-dim);font-family:var(--sans);font-weight:700;font-size:13px;padding:9px 6px;border-radius:8px;cursor:pointer;}
+  .seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.12);}
+  .seg.small button{font-size:12px;padding:7px 6px;}
 
-  .cam-card{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--border);}
-  video{width:100%;height:100%;object-fit:cover;display:block;background:#000;}
-  video.mirror{transform:scaleX(-1);}
-  canvas.diag{display:none;}
+  /* camera */
+  .cam-card{position:relative;background:#000;border-radius:14px;overflow:hidden;border:1px solid var(--border);display:flex;justify-content:center;}
+  .stage{position:relative;aspect-ratio:3 / 4;width:min(100%, calc(62vh * 0.75));}
+  .stage video,.stage canvas.overlay{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .stage video{object-fit:fill;background:#000;}
+  canvas.overlay{pointer-events:none;}
+  canvas.maskview{position:absolute;right:8px;bottom:12px;width:30%;border:1px solid rgba(255,255,255,0.45);border-radius:6px;image-rendering:pixelated;background:#000;pointer-events:none;}
+  canvas.maskview[hidden]{display:none;}
 
-  .roi-frame{position:absolute;left:10%;right:10%;top:38%;height:16%;border-top:2px dashed rgba(61,214,140,0.9);border-bottom:2px dashed rgba(61,214,140,0.9);pointer-events:none;}
-  .roi-frame::before{content:'감지선';position:absolute;top:-18px;left:0;font-family:var(--mono);font-size:10px;color:#3dd68c;background:rgba(0,0,0,0.55);padding:1px 5px;border-radius:4px;}
-  .roi-frame.trigger{border-color:#fff;}
-  .roi-frame.trigger::before{color:#fff;content:'감지!';}
-
-  .cam-overlay-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px;background:linear-gradient(to bottom,rgba(0,0,0,0.55),transparent);}
-  .icon-btn{width:34px;height:34px;border-radius:9px;background:rgba(20,27,34,0.7);border:1px solid rgba(255,255,255,0.15);color:#e6edf3;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;}
+  .cam-overlay-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:6px;padding:10px;background:linear-gradient(to bottom,rgba(0,0,0,0.55),transparent);z-index:2;}
+  .cam-overlay-top .grp{display:flex;gap:6px;}
+  .icon-btn{min-width:34px;height:34px;padding:0 8px;border-radius:9px;background:rgba(20,27,34,0.72);border:1px solid rgba(255,255,255,0.18);color:#e6edf3;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:var(--sans);font-weight:600;cursor:pointer;}
+  .icon-btn.on{border-color:#3dd68c;color:#3dd68c;}
   .icon-btn[hidden]{display:none;}
 
-  .cam-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#cfd8e0;font-size:13px;line-height:1.55;padding:24px;background:#0d1117;}
+  .cam-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#cfd8e0;font-size:13px;line-height:1.6;padding:24px;background:#0d1117;z-index:3;}
   .cam-msg .msg-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px;align-items:center;}
   .cam-msg .err{color:#f0a63d;font-size:11px;font-family:var(--mono);display:block;margin-top:6px;word-break:break-all;}
+  .cam-msg .legend{display:inline-flex;gap:12px;margin-top:10px;font-size:12px;color:#aab6c2;}
+  .cam-msg .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
 
-  .progress{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,0.12);}
+  .progress{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,0.12);z-index:2;}
   .progress > i{display:block;height:100%;width:0;background:#3dd68c;transition:width .2s linear;}
   .progress[hidden]{display:none;}
 
+  /* metrics */
   .metric-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;}
   .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
   .tile-label{font-size:10.5px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;font-weight:600;margin-bottom:6px;}
@@ -91,27 +89,31 @@
 
   .count-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;}
   .count-row .count-label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
-  .count-row .count-value{font-family:var(--mono);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;flex:1;}
+  .count-row .count-value{font-family:var(--mono);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .count-row .grow{flex:1;}
+  .chip{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:3px 8px;white-space:nowrap;}
+  .chip b{color:var(--warn);}
   .stepper{display:flex;gap:6px;}
-  .stepper button{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:16px;font-family:var(--mono);cursor:pointer;}
+  .stepper button{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:15px;font-family:var(--mono);cursor:pointer;}
   .stepper button:active{transform:scale(0.94);}
 
-  .controls{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+  /* controls */
+  .controls{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:14px;}
   .control-row{display:flex;flex-direction:column;gap:6px;}
   .control-row[hidden]{display:none;}
-  .control-row .row-top{display:flex;justify-content:space-between;align-items:center;}
-  .control-row label{font-size:12px;font-weight:600;color:var(--text);}
-  .control-row .hint{font-size:11px;color:var(--text-dim);font-family:var(--mono);}
-  input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--surface-2);outline:none;}
+  .control-row .row-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .control-row label,.control-row .lbl{font-size:12px;font-weight:600;color:var(--text);}
+  .control-row .hint{font-size:11px;color:var(--text-dim);font-family:var(--mono);text-align:right;}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--surface-2);outline:none;}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--border);cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);}
   select{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:var(--sans);}
 
-  .btn-row{display:flex;gap:8px;}
-  button.action{flex:1;padding:12px;border-radius:11px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;}
+  .btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  button.action{padding:12px;border-radius:11px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;}
   button.action.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
   button.action.ghost{background:transparent;border-color:rgba(255,255,255,0.25);color:#e6edf3;}
   button.action:active{transform:scale(0.98);}
-  button.action:disabled{opacity:.5;cursor:default;}
 
   .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px 10px;}
   .chart-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
@@ -122,7 +124,7 @@
   .bar.empty{fill:var(--surface-2);}
   .axis-label{font-family:var(--mono);font-size:9px;fill:var(--text-dim);}
 
-  footer{text-align:center;font-size:10.5px;color:var(--text-dim);font-family:var(--mono);padding-top:4px;line-height:1.6;}
+  footer{text-align:center;font-size:10.5px;color:var(--text-dim);font-family:var(--mono);padding-top:4px;line-height:1.7;}
   .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
   button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 </style>
@@ -133,29 +135,31 @@
   <header>
     <div>
       <h1>라인 속도 카운터</h1>
-      <div class="sub" id="sessionClock">00:00:00 경과</div>
+      <div class="sub" id="sessionClock">00:00 / 00:00</div>
     </div>
     <div class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">대기 중</span></div>
   </header>
 
-  <div class="mode-tabs" role="tablist">
+  <div class="seg" role="tablist">
     <button id="tabVideo" class="on" role="tab">동영상 분석</button>
     <button id="tabLive" role="tab">실시간 카메라</button>
   </div>
 
-  <div class="cam-card">
-    <video id="video" playsinline muted></video>
-    <canvas class="diag" id="diagCanvas"></canvas>
-    <div class="roi-frame" id="roiFrame"></div>
+  <div class="cam-card" id="camCard">
+    <div class="stage" id="stage">
+      <video id="video" playsinline muted></video>
+      <canvas class="overlay" id="overlay"></canvas>
+      <canvas class="maskview" id="maskView" hidden></canvas>
+    </div>
     <div class="cam-overlay-top">
-      <button class="icon-btn" id="flipBtn" title="카메라 전환" aria-label="카메라 전환" hidden>⟲</button>
-      <span></span>
+      <div class="grp">
+        <button class="icon-btn" id="flipBtn" title="카메라 전환" aria-label="카메라 전환" hidden>⟲</button>
+        <button class="icon-btn" id="maskBtn" title="감지 화면 보기" aria-pressed="false">감지화면</button>
+      </div>
       <button class="icon-btn" id="soundBtn" title="소리 켜기/끄기" aria-label="소리 켜기/끄기">🔕</button>
     </div>
     <div class="progress" id="progress" hidden><i id="progressBar"></i></div>
-    <div class="cam-msg" id="camMsg">
-      <div id="camMsgInner"></div>
-    </div>
+    <div class="cam-msg" id="camMsg"><div id="camMsgInner"></div></div>
   </div>
   <input type="file" id="videoInput" accept="video/*" capture="environment" class="visually-hidden" aria-label="동영상 선택">
 
@@ -167,20 +171,21 @@
     <div class="tile-sub">
       <div class="tile">
         <div class="tile-label" id="subLabel">분석 구간</div>
-        <span class="value" id="ppmValue">0</span><span class="unit" id="subUnit">초</span>
+        <div><span class="value" id="ppmValue">0</span><span class="unit" id="subUnit">초</span></div>
       </div>
       <div class="tile">
         <div class="tile-label">평균 간격</div>
-        <span class="value" id="intervalValue">--</span><span class="unit">초/개</span>
+        <div><span class="value" id="intervalValue">--</span><span class="unit">초/개</span></div>
       </div>
     </div>
   </div>
 
   <div class="count-row">
-    <div>
+    <div class="grow">
       <div class="count-label">누적 카운트</div>
-      <div class="count-value"><span id="countValue">0</span><span class="unit" style="font-size:13px;">개</span></div>
+      <div class="count-value"><span id="countValue">0</span><span class="unit" style="font-size:13px;font-family:var(--mono);color:var(--text-dim);margin-left:4px;">개</span></div>
     </div>
+    <span class="chip">추적 중 <b id="trackingValue">0</b></span>
     <div class="stepper">
       <button id="minusBtn" aria-label="1개 빼기">−1</button>
       <button id="plusBtn" aria-label="1개 더하기">+1</button>
@@ -189,41 +194,37 @@
 
   <div class="controls">
     <div class="control-row">
-      <div class="row-top">
-        <label for="sensSlider">감지 민감도</label>
-        <span class="hint" id="sensHint">중간</span>
+      <div class="row-top"><span class="lbl">제품 이동 방향</span><span class="hint">화면 기준</span></div>
+      <div class="seg small" id="dirSeg">
+        <button data-dir="v" class="on">↕ 위·아래로 이동</button>
+        <button data-dir="h">↔ 좌·우로 이동</button>
       </div>
+    </div>
+    <div class="control-row">
+      <div class="row-top"><label for="lineSlider">카운트 라인 위치</label><span class="hint" id="lineHint">50%</span></div>
+      <input type="range" id="lineSlider" min="10" max="90" value="50" step="1">
+    </div>
+    <div class="control-row">
+      <div class="row-top"><label for="sensSlider">감지 민감도</label><span class="hint" id="sensHint">중간</span></div>
       <input type="range" id="sensSlider" min="1" max="9" value="5" step="1">
     </div>
     <div class="control-row">
-      <div class="row-top">
-        <label for="roiSlider">감지선 위치 (화면 세로 기준)</label>
-        <span class="hint" id="roiHint">38%</span>
-      </div>
-      <input type="range" id="roiSlider" min="15" max="70" value="38" step="1">
-    </div>
-    <div class="control-row">
-      <div class="row-top"><label for="cooldownSelect">최소 통과 간격</label></div>
-      <select id="cooldownSelect">
-        <option value="150">빠른 라인 (0.15초)</option>
-        <option value="300" selected>보통 (0.3초)</option>
-        <option value="600">느린 라인 (0.6초)</option>
-        <option value="1000">매우 느림 (1.0초)</option>
-      </select>
+      <div class="row-top"><label for="sizeSlider">최소 제품 크기</label><span class="hint" id="sizeHint">작게</span></div>
+      <input type="range" id="sizeSlider" min="1" max="9" value="3" step="1">
     </div>
     <div class="control-row" id="speedRow">
-      <div class="row-top"><label for="speedSelect">분석 속도</label><span class="hint">빠를수록 프레임이 일부 생략됩니다</span></div>
+      <div class="row-top"><label for="speedSelect">분석 속도</label><span class="hint">빠를수록 정확도가 조금 떨어집니다</span></div>
       <select id="speedSelect">
-        <option value="1">1배속 (가장 정확)</option>
-        <option value="2" selected>2배속</option>
-        <option value="4">4배속</option>
+        <option value="1" selected>1배속 (가장 정확)</option>
+        <option value="2">2배속</option>
       </select>
     </div>
   </div>
 
-  <div class="btn-row">
+  <div class="btn-grid">
     <button class="action" id="pauseBtn">일시정지</button>
     <button class="action" id="resetBtn">초기화</button>
+    <button class="action" id="relearnBtn">배경 다시 잡기</button>
     <button class="action primary" id="exportBtn">CSV 내보내기</button>
   </div>
 
@@ -235,7 +236,7 @@
     <svg class="chart" id="chartSvg" viewBox="0 0 300 110" preserveAspectRatio="none"></svg>
   </div>
 
-  <footer>감지선을 지나는 픽셀 변화로 상품 통과를 인식합니다.<br>조명이 일정하고 배경(벨트)이 단순할수록, 상품이 배경과 대비될수록 정확합니다.</footer>
+  <footer>주황 점 = 추적 중인 제품 · 초록 점과 번호 = 카운트 라인을 넘어 집계된 제품<br>휴대폰을 고정하고, 벨트 무늬가 단순하고 조명이 일정할수록 정확합니다.<br>영상은 휴대폰 안에서만 분석되며 외부로 전송되지 않습니다.</footer>
 </div>
 
 <div class="visually-hidden" aria-live="polite" id="liveRegion"></div>
@@ -243,50 +244,291 @@
 <script>
 (function(){
   'use strict';
+  var $ = function(id){ return document.getElementById(id); };
 
-  // ===== state =====
+  // ================= state =================
   var state = {
-    mode:'video',           // 'video' | 'live'
-    running:false,
-    paused:false,
-    finished:false,
-    count:0,
-    events:[],              // ms: live = epoch ms, video = media time ms
-    buckets:[],             // {start:ms, count}
-    startedAt:null,         // live: epoch ms
-    videoFile:null,
-    videoDurationMs:0,
-    processedMs:0,
-    facingMode:'environment',
-    soundOn:false,
-    sensitivity:5,
-    roiTop:0.38,
-    cooldownMs:300,
-    // detector
-    lastTrigger:-1e9,
-    active:false,
-    baseline:0
+    mode:'video', running:false, paused:false, finished:false,
+    count:0, events:[], buckets:[], startedAt:null,
+    videoFile:null, videoDurationMs:0, processedMs:0,
+    facingMode:'environment', soundOn:false, showMask:false,
+    sensitivity:5, sizeLevel:3, linePos:0.5, dir:'v',
+    vw:0, vh:0
   };
 
-  var $ = function(id){ return document.getElementById(id); };
-  var video=$('video'), diagCanvas=$('diagCanvas'), dctx=diagCanvas.getContext('2d',{willReadFrequently:true});
-  var camMsg=$('camMsg'), camMsgInner=$('camMsgInner'), roiFrame=$('roiFrame');
+  var video=$('video'), stage=$('stage'), overlay=$('overlay'), octx=overlay.getContext('2d');
+  var maskView=$('maskView'), mctx=maskView.getContext('2d'), maskImg=null;
+  var camMsg=$('camMsg'), camMsgInner=$('camMsgInner');
   var statusPill=$('statusPill'), statusText=$('statusText'), liveRegion=$('liveRegion');
   var uphValue=$('uphValue'), ppmValue=$('ppmValue'), intervalValue=$('intervalValue'), countValue=$('countValue');
-  var sessionClock=$('sessionClock'), subLabel=$('subLabel'), subUnit=$('subUnit');
-  var progress=$('progress'), progressBar=$('progressBar');
-  var videoInput=$('videoInput'), flipBtn=$('flipBtn'), pauseBtn=$('pauseBtn');
-  var chartTitle=$('chartTitle'), chartNote=$('chartNote');
+  var trackingValue=$('trackingValue'), sessionClock=$('sessionClock'), subLabel=$('subLabel'), subUnit=$('subUnit');
+  var progress=$('progress'), progressBar=$('progressBar'), videoInput=$('videoInput');
+  var flipBtn=$('flipBtn'), pauseBtn=$('pauseBtn'), chartTitle=$('chartTitle'), chartNote=$('chartNote');
 
-  var stream=null, rafId=null, vfcId=null, prevFrame=null;
-  var sampleW=64, sampleH=24;
-  var ROI_H=0.16;
+  var stream=null, rafId=null, vfcId=null;
 
   function bucketMs(){ return state.mode==='video' ? 10000 : 60000; }
   function mmss(ms){ var s=Math.max(0,Math.floor(ms/1000)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
   function hhmmss(ms){ var s=Math.max(0,Math.floor(ms/1000)); return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 
-  // ===== audio =====
+  // ================= detection + tracking engine =================
+  // 1) Downscale frame → 2) compare with learned background (belt) → foreground mask
+  // 3) clean mask (open/close) → 4) connected blobs = products → 5) match blobs to
+  // existing tracks frame-to-frame → 6) a track that crosses the count line is counted once.
+  var SENS_T = [90,75,62,52,44,37,31,26,22];                      // RGB diff threshold per sensitivity
+  var SIZE_F = [0.002,0.004,0.007,0.01,0.015,0.022,0.03,0.04,0.055]; // min blob area (fraction of frame)
+  var LEARN_FRAMES = 25;
+  var STILL_FRAMES = 45;
+
+  var procCanvas=document.createElement('canvas');
+  var pctx=procCanvas.getContext('2d',{willReadFrequently:true});
+  var P = { W:0, H:0, bg:null, frames:0, mask:null, tmp:null, labels:null, stack:null };
+  var tracks=[], nextId=1, lineFlash=0, lastNote='';
+
+  function setupProc(vw,vh){
+    var LONG=160;
+    if(vw>=vh){ P.W=LONG; P.H=Math.max(40,Math.round(LONG*vh/vw)); }
+    else      { P.H=LONG; P.W=Math.max(40,Math.round(LONG*vw/vh)); }
+    procCanvas.width=P.W; procCanvas.height=P.H;
+    var n=P.W*P.H;
+    P.mask=new Uint8Array(n); P.tmp=new Uint8Array(n); P.labels=new Int32Array(n); P.stack=new Int32Array(n);
+    maskView.width=P.W; maskView.height=P.H; maskImg=mctx.createImageData(P.W,P.H);
+    resetTracker();
+  }
+  function resetTracker(){ P.bg=null; P.frames=0; tracks=[]; lineFlash=0; trackingValue.textContent='0'; }
+
+  function erode(src,dst,W,H){
+    for(var y=0;y<H;y++){ var y0=y>0?y-1:0, y1=y<H-1?y+1:H-1;
+      for(var x=0;x<W;x++){ var x0=x>0?x-1:0, x1=x<W-1?x+1:W-1, v=1;
+        for(var yy=y0;yy<=y1&&v;yy++){ var r=yy*W; for(var xx=x0;xx<=x1;xx++){ if(!src[r+xx]){ v=0; break; } } }
+        dst[y*W+x]=v; } }
+  }
+  function dilate(src,dst,W,H){
+    for(var y=0;y<H;y++){ var y0=y>0?y-1:0, y1=y<H-1?y+1:H-1;
+      for(var x=0;x<W;x++){ var x0=x>0?x-1:0, x1=x<W-1?x+1:W-1, v=0;
+        for(var yy=y0;yy<=y1&&!v;yy++){ var r=yy*W; for(var xx=x0;xx<=x1;xx++){ if(src[r+xx]){ v=1; break; } } }
+        dst[y*W+x]=v; } }
+  }
+
+  function findBlobs(){
+    var W=P.W,H=P.H,n=W*H,mask=P.mask,lab=P.labels,st=P.stack,blobs=[],minArea=SIZE_F[state.sizeLevel-1]*n;
+    lab.fill(0);
+    var id=0;
+    for(var i=0;i<n;i++){
+      if(!mask[i]||lab[i]) continue;
+      id++; var sp=0; st[sp++]=i; lab[i]=id;
+      var area=0,sx=0,sy=0,minx=W,maxx=0,miny=H,maxy=0;
+      while(sp>0){
+        var p=st[--sp], px=p%W, py=(p-px)/W;
+        area++; sx+=px; sy+=py;
+        if(px<minx)minx=px; if(px>maxx)maxx=px; if(py<miny)miny=py; if(py>maxy)maxy=py;
+        for(var dy=-1;dy<=1;dy++){ var ny=py+dy; if(ny<0||ny>=H) continue;
+          for(var dx=-1;dx<=1;dx++){ var nx=px+dx; if(nx<0||nx>=W) continue;
+            var q=ny*W+nx; if(mask[q]&&!lab[q]){ lab[q]=id; st[sp++]=q; } } }
+      }
+      if(area>=minArea) blobs.push({x:sx/area, y:sy/area, area:area, minx:minx, maxx:maxx, miny:miny, maxy:maxy});
+    }
+    return blobs;
+  }
+
+  function processFrame(tStamp){
+    var vw=video.videoWidth, vh=video.videoHeight;
+    if(!vw||!vh) return;
+    if(vw!==state.vw||vh!==state.vh){ state.vw=vw; state.vh=vh; setupProc(vw,vh); fitStage(); }
+    var W=P.W,H=P.H,n=W*H;
+    pctx.drawImage(video,0,0,W,H);
+    var px=pctx.getImageData(0,0,W,H).data;
+    var i,j,k;
+    if(!P.bg){ P.bg=new Float32Array(n*3); for(i=0,j=0,k=0;i<n;i++,j+=4,k+=3){ P.bg[k]=px[j]; P.bg[k+1]=px[j+1]; P.bg[k+2]=px[j+2]; } P.frames=0; }
+
+    var T=SENS_T[state.sensitivity-1], bg=P.bg, mask=P.mask, fg=0;
+    for(i=0,j=0,k=0;i<n;i++,j+=4,k+=3){
+      var d=Math.abs(px[j]-bg[k])+Math.abs(px[j+1]-bg[k+1])+Math.abs(px[j+2]-bg[k+2]);
+      var f=d>T?1:0; mask[i]=f; fg+=f;
+    }
+    P.frames++;
+    var learning=P.frames<=LEARN_FRAMES;
+    var globalChange=fg>n*0.6;                     // auto-exposure / lights → relearn quickly
+    // Foreground pixels barely update: on a busy lane products cover the belt most of the
+    // time, and a faster rate drags the background toward product colour until the whole
+    // lane fuses into one blob. Stopped objects are absorbed explicitly instead (see absorb()).
+    var aB=(learning||globalChange)?0.2:0.04, aF=(learning||globalChange)?0.2:0.0005;
+    P.px=px;
+    for(i=0,j=0,k=0;i<n;i++,j+=4,k+=3){
+      var a=mask[i]?aF:aB;
+      bg[k]+=(px[j]-bg[k])*a; bg[k+1]+=(px[j+1]-bg[k+1])*a; bg[k+2]+=(px[j+2]-bg[k+2])*a;
+    }
+    if(learning||globalChange){
+      lastNote = learning ? '배경 학습 중…' : '밝기 변화 감지 · 배경 재학습';
+      if(globalChange){ tracks=[]; }
+      drawOverlay(); drawMask(); return;
+    }
+    lastNote='';
+    // open (remove speckle) then close twice (fill holes inside products)
+    erode(mask,P.tmp,W,H); dilate(P.tmp,mask,W,H);
+    dilate(mask,P.tmp,W,H); dilate(P.tmp,mask,W,H); erode(mask,P.tmp,W,H); erode(P.tmp,mask,W,H);
+    var blobs=findBlobs();
+    updateTracks(blobs,tStamp);
+    drawOverlay(); drawMask();
+  }
+
+  function updateTracks(blobs,t){
+    var W=P.W,H=P.H, maxD=Math.hypot(W,H)*0.18, pairs=[], ti, bi;
+    for(ti=0;ti<tracks.length;ti++){
+      var tr=tracks[ti], ex=tr.x+tr.vx, ey=tr.y+tr.vy, gate=maxD+Math.hypot(tr.vx,tr.vy);
+      for(bi=0;bi<blobs.length;bi++){ var d=Math.hypot(blobs[bi].x-ex, blobs[bi].y-ey); if(d<gate) pairs.push([d,ti,bi]); }
+    }
+    pairs.sort(function(a,b){ return a[0]-b[0]; });
+    var tUsed=new Uint8Array(tracks.length), bUsed=new Uint8Array(blobs.length);
+    pairs.forEach(function(p){
+      if(tUsed[p[1]]||bUsed[p[2]]) return;
+      tUsed[p[1]]=1; bUsed[p[2]]=1;
+      var tr=tracks[p[1]], b=blobs[p[2]], nvx=b.x-tr.x, nvy=b.y-tr.y;
+      if(tr.hits===1){ tr.vx=nvx; tr.vy=nvy; } else { tr.vx=tr.vx*0.6+nvx*0.4; tr.vy=tr.vy*0.6+nvy*0.4; }
+      tr.px=tr.x; tr.py=tr.y; tr.x=b.x; tr.y=b.y; tr.hits++; tr.missed=0; tr.box=b;
+      tr.trail.push([b.x,b.y]); if(tr.trail.length>14) tr.trail.shift();
+      tr.maxDisp=Math.max(tr.maxDisp, Math.hypot(b.x-tr.ox, b.y-tr.oy));
+      checkCross(tr,t);
+      // Something that has NEVER moved since it appeared (a ghost left over from start-up,
+      // a fixture, a resting hand) → fold it into the background.
+      // A product that moved and then stopped (belt halted) keeps its track instead, so
+      // when the belt restarts it is not counted a second time.
+      if(tr.hits>=STILL_FRAMES && tr.maxDisp<4){ absorb(b); tr.dead=true; }
+    });
+    for(ti=0;ti<tracks.length;ti++){
+      if(tUsed[ti]) continue;
+      var tr2=tracks[ti]; tr2.missed++; tr2.px=tr2.x; tr2.py=tr2.y; tr2.x+=tr2.vx; tr2.y+=tr2.vy;
+      if(tr2.hits>=3) checkCross(tr2,t);         // coast through a brief detection dropout
+    }
+    tracks=tracks.filter(function(tr){ return !tr.dead && tr.missed<=6 && tr.x>-W*0.2 && tr.x<W*1.2 && tr.y>-H*0.2 && tr.y<H*1.2; });
+    for(bi=0;bi<blobs.length;bi++){
+      if(bUsed[bi]) continue;
+      var b=blobs[bi];
+      tracks.push({id:nextId++, x:b.x, y:b.y, px:b.x, py:b.y, vx:0, vy:0, hits:1, missed:0, counted:false, num:0, trail:[[b.x,b.y]], ox:b.x, oy:b.y, maxDisp:0, box:b, flash:0, dead:false});
+    }
+    var active=0; tracks.forEach(function(tr){ if(tr.hits>=2 && tr.missed===0 && !tr.counted) active++; });
+    trackingValue.textContent=active;
+  }
+
+  function absorb(b){
+    var W=P.W,H=P.H,bg=P.bg,px=P.px; if(!bg||!px) return;
+    var x0=Math.max(0,b.minx-2),x1=Math.min(W-1,b.maxx+2),y0=Math.max(0,b.miny-2),y1=Math.min(H-1,b.maxy+2);
+    for(var y=y0;y<=y1;y++) for(var x=x0;x<=x1;x++){ var i=y*W+x,j=i*4,k=i*3; bg[k]=px[j]; bg[k+1]=px[j+1]; bg[k+2]=px[j+2]; }
+  }
+
+  function checkCross(tr,t){
+    if(tr.counted||tr.hits<2) return;
+    var L=state.linePos, a, b;
+    if(state.dir==='v'){ a=tr.py/P.H; b=tr.y/P.H; } else { a=tr.px/P.W; b=tr.x/P.W; }
+    if((a<L&&b>=L)||(a>L&&b<=L)){
+      tr.counted=true; tr.flash=1; lineFlash=1;
+      tr.num=registerPass(t);
+    }
+  }
+
+  // ================= drawing =================
+  function fitStage(){
+    if(!state.vw||!state.vh) return;
+    var ar=state.vw/state.vh;
+    stage.style.aspectRatio=state.vw+' / '+state.vh;
+    stage.style.width='min(100%, calc(62vh * '+ar.toFixed(4)+'))';
+  }
+  function sizeOverlay(){
+    var cw=stage.clientWidth, ch=stage.clientHeight, dpr=window.devicePixelRatio||1;
+    var w=Math.round(cw*dpr), h=Math.round(ch*dpr);
+    if(overlay.width!==w||overlay.height!==h){ overlay.width=w; overlay.height=h; }
+    octx.setTransform(dpr,0,0,dpr,0,0);
+    return {cw:cw,ch:ch};
+  }
+  function pill(text,x,y,bg,fg){
+    octx.font='600 11px '+getComputedStyle(document.body).fontFamily;
+    var w=octx.measureText(text).width+10;
+    octx.fillStyle=bg; octx.beginPath();
+    if(octx.roundRect) octx.roundRect(x,y,w,18,5); else octx.rect(x,y,w,18);
+    octx.fill(); octx.fillStyle=fg; octx.textBaseline='middle'; octx.textAlign='left';
+    octx.fillText(text,x+5,y+9.5);
+  }
+  function drawOverlay(){
+    var s=sizeOverlay(), cw=s.cw, ch=s.ch;
+    octx.clearRect(0,0,cw,ch);
+    var L=state.linePos;
+    // count line
+    octx.save();
+    octx.setLineDash([9,6]); octx.lineWidth=lineFlash>0?4:2.5;
+    octx.strokeStyle=lineFlash>0?'#ffffff':'rgba(240,166,61,0.95)';
+    octx.shadowColor='rgba(0,0,0,0.6)'; octx.shadowBlur=3;
+    octx.beginPath();
+    if(state.dir==='v'){ octx.moveTo(0,L*ch); octx.lineTo(cw,L*ch); } else { octx.moveTo(L*cw,0); octx.lineTo(L*cw,ch); }
+    octx.stroke(); octx.restore();
+    if(state.dir==='v') pill('카운트 라인',8,Math.max(48,L*ch-24),'rgba(0,0,0,0.6)','#f0a63d');
+    else pill('카운트 라인',Math.min(cw-84,L*cw+6),52,'rgba(0,0,0,0.6)','#f0a63d');
+    if(lineFlash>0) lineFlash=Math.max(0,lineFlash-0.15);
+
+    if(P.W){
+      var sx=cw/P.W, sy=ch/P.H;
+      tracks.forEach(function(tr){
+        if(tr.hits<2) return;
+        var col = tr.counted ? '#3dd68c' : '#f0a63d';
+        // trail
+        if(tr.trail.length>1){
+          octx.save(); octx.lineWidth=2.5; octx.strokeStyle=tr.counted?'rgba(61,214,140,0.55)':'rgba(240,166,61,0.55)';
+          octx.beginPath(); tr.trail.forEach(function(p,ix){ var X=p[0]*sx, Y=p[1]*sy; if(ix) octx.lineTo(X,Y); else octx.moveTo(X,Y); });
+          octx.stroke(); octx.restore();
+        }
+        // faint outline of the detected product
+        if(tr.box && tr.missed===0){
+          octx.save(); octx.strokeStyle=tr.counted?'rgba(61,214,140,0.45)':'rgba(240,166,61,0.45)'; octx.lineWidth=1.5;
+          octx.strokeRect(tr.box.minx*sx, tr.box.miny*sy, (tr.box.maxx-tr.box.minx+1)*sx, (tr.box.maxy-tr.box.miny+1)*sy);
+          octx.restore();
+        }
+        var X=tr.x*sx, Y=tr.y*sy;
+        if(tr.flash>0){
+          octx.save(); octx.strokeStyle='rgba(61,214,140,'+tr.flash.toFixed(2)+')'; octx.lineWidth=3;
+          octx.beginPath(); octx.arc(X,Y,9+(1-tr.flash)*22,0,Math.PI*2); octx.stroke(); octx.restore();
+          tr.flash=Math.max(0,tr.flash-0.07);
+        }
+        octx.save();
+        octx.beginPath(); octx.arc(X,Y,8,0,Math.PI*2);
+        octx.fillStyle=col; octx.fill(); octx.lineWidth=2.5; octx.strokeStyle='#0b0f14'; octx.stroke();
+        octx.restore();
+        if(tr.counted) pill('#'+tr.num, X+11, Y-9, 'rgba(4,21,12,0.85)', '#3dd68c');
+      });
+    }
+    if(lastNote) pill(lastNote, cw/2-50, ch-34, 'rgba(0,0,0,0.65)', '#e6edf3');
+  }
+  function drawMask(){
+    if(!state.showMask||!maskImg) return;
+    var m=P.mask, d=maskImg.data;
+    for(var i=0,j=0;i<m.length;i++,j+=4){ var on=m[i]; d[j]=on?61:0; d[j+1]=on?214:0; d[j+2]=on?140:0; d[j+3]=255; }
+    mctx.putImageData(maskImg,0,0);
+  }
+  window.addEventListener('resize', function(){ drawOverlay(); });
+
+  // ================= frame loop (shared by both modes) =================
+  function loop(){
+    if(!state.running) return;
+    if('requestVideoFrameCallback' in video){
+      vfcId=video.requestVideoFrameCallback(function(now,meta){ onFrame(meta.mediaTime); loop(); });
+    } else {
+      rafId=requestAnimationFrame(function(){ onFrame(video.currentTime); loop(); });
+    }
+  }
+  function onFrame(mediaTime){
+    if(state.paused||!state.running) return;
+    if(state.mode==='video'){
+      var ms=mediaTime*1000;
+      state.processedMs=ms;
+      processFrame(ms);
+      if(state.videoDurationMs>0){
+        progressBar.style.width=Math.min(100,ms/state.videoDurationMs*100).toFixed(1)+'%';
+        sessionClock.textContent=mmss(ms)+' / '+mmss(state.videoDurationMs);
+      }
+    } else {
+      processFrame(Date.now());
+    }
+  }
+
+  // ================= counting / metrics =================
   var actx=null;
   function beep(){
     if(!state.soundOn) return;
@@ -299,145 +541,6 @@
       o.stop(actx.currentTime+0.1);
     }catch(e){}
   }
-  $('soundBtn').addEventListener('click', function(e){
-    state.soundOn=!state.soundOn;
-    e.currentTarget.textContent = state.soundOn?'🔔':'🔕';
-    if(state.soundOn && !actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(err){} }
-  });
-
-  // ===== idle messages =====
-  function showIdleMessage(){
-    camMsg.style.display='flex';
-    if(state.mode==='video'){
-      camMsgInner.innerHTML =
-        '카메라 앱으로 라인을 <b>1~2분</b> 촬영한 뒤 불러오세요.<br>상품이 초록 점선을 가로지르도록 찍으면 됩니다.' +
-        '<div class="msg-actions">' +
-        '<button class="action primary" id="pickVideoBtn" style="padding:11px 22px;">동영상 촬영 · 불러오기</button>' +
-        '</div>';
-      $('pickVideoBtn').addEventListener('click', function(){ videoInput.click(); });
-    } else {
-      camMsgInner.innerHTML =
-        '휴대폰을 컨베이어 위에 고정하고<br>상품이 초록 점선을 가로지르게 비춰주세요.' +
-        '<div class="msg-actions">' +
-        '<button class="action primary" id="startCamBtn" style="padding:11px 22px;">카메라 시작</button>' +
-        '</div>';
-      $('startCamBtn').addEventListener('click', startLive);
-    }
-  }
-
-  function showLiveError(err){
-    camMsg.style.display='flex';
-    var msg = err && err.message ? err.message : '';
-    var name = err && err.name ? err.name : '';
-    var why;
-    if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){
-      why='이 화면(주소)에서는 브라우저가 카메라 API를 제공하지 않습니다.';
-    } else if(name==='NotAllowedError' || /denied/i.test(msg)){
-      why='카메라 권한이 거부됐습니다.<br><br>' +
-          '<b>권한 팝업이 아예 안 떴다면</b>: 앱 안 미리보기 창, 카톡·메신저 링크 미리보기, 다운로드한 파일로 연 경우입니다. ' +
-          '배포된 <b>https 주소를 Chrome·Safari에서 직접</b> 열어주세요.<br>' +
-          '<b>예전에 \'차단\'을 누른 적이 있다면</b>: 주소창 왼쪽 아이콘 → 권한 → 카메라 → 허용으로 바꿔주세요.';
-    } else if(name==='NotFoundError'){
-      why='사용할 수 있는 카메라를 찾지 못했습니다.';
-    } else if(name==='NotReadableError'){
-      why='다른 앱이 카메라를 사용 중입니다. 카메라 앱을 종료하고 다시 시도하세요.';
-    } else {
-      why='카메라를 열지 못했습니다.';
-    }
-    camMsgInner.innerHTML =
-      why + (msg?'<span class="err">'+name+': '+msg+'</span>':'') +
-      '<div class="msg-actions">' +
-      '<button class="action primary" id="switchVideoBtn" style="padding:11px 22px;">동영상 분석으로 전환</button>' +
-      '<button class="action ghost" id="retryCamBtn" style="padding:9px 18px;">다시 시도</button>' +
-      '</div>';
-    $('switchVideoBtn').addEventListener('click', function(){ setMode('video'); });
-    $('retryCamBtn').addEventListener('click', startLive);
-  }
-
-  // ===== mode switching =====
-  function setMode(mode){
-    stopEverything();
-    state.mode=mode;
-    $('tabVideo').classList.toggle('on', mode==='video');
-    $('tabLive').classList.toggle('on', mode==='live');
-    $('speedRow').hidden = mode!=='video';
-    flipBtn.hidden = mode!=='live';
-    video.classList.remove('mirror');
-    if(mode==='video'){
-      subLabel.textContent='분석 구간'; subUnit.textContent='초';
-      chartTitle.textContent='구간별 생산량 (10초 단위)';
-      pauseBtn.textContent='일시정지';
-    } else {
-      subLabel.textContent='최근 1분'; subUnit.textContent='개/분';
-      chartTitle.textContent='구간별 생산량 (1분 단위)';
-      pauseBtn.textContent='일시정지';
-    }
-    resetCounts();
-    setStatus('idle','대기 중');
-    showIdleMessage();
-  }
-  $('tabVideo').addEventListener('click', function(){ if(state.mode!=='video') setMode('video'); });
-  $('tabLive').addEventListener('click', function(){ if(state.mode!=='live') setMode('live'); });
-
-  function stopEverything(){
-    if(rafId) cancelAnimationFrame(rafId); rafId=null;
-    if(vfcId && video.cancelVideoFrameCallback) video.cancelVideoFrameCallback(vfcId); vfcId=null;
-    if(stream){ stream.getTracks().forEach(function(t){t.stop();}); stream=null; }
-    try{ video.pause(); }catch(e){}
-    if(video.srcObject) video.srcObject=null;
-    if(video.src){ URL.revokeObjectURL(video.src); video.removeAttribute('src'); video.load(); }
-    state.running=false; state.paused=false; state.finished=false;
-    progress.hidden=true; progressBar.style.width='0';
-    prevFrame=null;
-  }
-
-  function resetCounts(){
-    state.count=0; state.events=[]; state.buckets=[];
-    state.startedAt=null; state.processedMs=0;
-    state.lastTrigger=-1e9; state.active=false; state.baseline=0;
-    prevFrame=null;
-    countValue.textContent='0'; uphValue.textContent='0'; ppmValue.textContent='0'; intervalValue.textContent='--';
-    sessionClock.textContent = state.mode==='video' ? '00:00 / 00:00' : '00:00:00 경과';
-    chartNote.textContent='';
-    renderChart();
-  }
-
-  // ===== detector (shared) =====
-  // nowMs: live → performance.now(); video → media time ms
-  function analyzeFrame(nowMs, tStamp){
-    if(!video.videoWidth) return;
-    var vw=video.videoWidth, vh=video.videoHeight;
-    var sx=vw*0.10, sw=vw*0.80, sy=vh*state.roiTop, sh=vh*ROI_H;
-    dctx.drawImage(video, sx, sy, sw, sh, 0, 0, sampleW, sampleH);
-    var frame=dctx.getImageData(0,0,sampleW,sampleH).data;
-    var gray=new Uint8ClampedArray(sampleW*sampleH);
-    for(var i=0,p=0;i<frame.length;i+=4,p++){ gray[p]=frame[i]*0.299+frame[i+1]*0.587+frame[i+2]*0.114; }
-
-    if(prevFrame){
-      var pixThr = 26 - state.sensitivity*2;        // per-pixel change threshold
-      var changed=0;
-      for(var j=0;j<gray.length;j++){ if(Math.abs(gray[j]-prevFrame[j])>pixThr) changed++; }
-      var score=changed/gray.length;                 // 0..1 fraction of ROI that moved
-
-      // adaptive baseline: absorbs belt texture / noise while nothing is passing
-      if(!state.active){ state.baseline = state.baseline*0.97 + score*0.03; }
-      var margin = Math.max(0.03, 0.16 - state.sensitivity*0.012);
-      var hi = state.baseline + margin;
-      var lo = state.baseline + margin*0.45;
-
-      var cooling = (nowMs - state.lastTrigger) < state.cooldownMs;
-      if(!state.active && score>hi && !cooling){
-        state.active=true; state.lastTrigger=nowMs;
-        registerPass(tStamp);
-        roiFrame.classList.add('trigger');
-        setTimeout(function(){ roiFrame.classList.remove('trigger'); },160);
-      } else if(state.active && score<lo){
-        state.active=false;                          // product has cleared the line
-      }
-    }
-    prevFrame=gray;
-  }
-
   function registerPass(t){
     state.count++;
     state.events.push(t);
@@ -445,33 +548,29 @@
     addToBucket(t);
     updateMetrics();
     beep();
-    liveRegion.textContent=state.count+'번째 상품 감지';
+    liveRegion.textContent=state.count+'번째 제품 카운트';
+    return state.count;
   }
   function addToBucket(t){
-    var bm=bucketMs(), start=Math.floor(t/bm)*bm;
-    var last=state.buckets[state.buckets.length-1];
-    if(last && last.start===start){ last.count++; }
+    var bm=bucketMs(), start=Math.floor(t/bm)*bm, last=state.buckets[state.buckets.length-1];
+    if(last&&last.start===start) last.count++;
     else { state.buckets.push({start:start,count:1}); if(state.buckets.length>60) state.buckets.shift(); }
   }
-
-  // ===== metrics =====
   function updateMetrics(){
     var uph=0;
     if(state.mode==='video'){
       var secs=state.processedMs/1000;
-      ppmValue.textContent = secs.toFixed(0);
-      if(secs>0 && state.count>0) uph=Math.round(state.count/secs*3600);
+      ppmValue.textContent=secs.toFixed(0);
+      if(secs>0&&state.count>0) uph=Math.round(state.count/secs*3600);
     } else {
-      var now=Date.now(), oneMinAgo=now-60000;
-      var recent=state.events.filter(function(e){return e>=oneMinAgo;}).length;
+      var now=Date.now(), recent=state.events.filter(function(e){ return e>=now-60000; }).length;
       ppmValue.textContent=recent.toLocaleString();
       var elapsed=state.startedAt?(now-state.startedAt):0;
-      if(elapsed<60000 && state.count>0 && elapsed>0) uph=Math.round(state.count/(elapsed/3600000));
-      else uph=Math.round(recent*60);
+      if(elapsed>0&&elapsed<60000&&state.count>0) uph=Math.round(state.count/(elapsed/3600000));
+      else uph=recent*60;
     }
     if(!isFinite(uph)||uph<0) uph=0;
     uphValue.textContent=uph.toLocaleString();
-
     if(state.events.length>=2){
       var span=(state.events[state.events.length-1]-state.events[0])/1000;
       intervalValue.textContent=(span/(state.events.length-1)).toFixed(1);
@@ -479,150 +578,171 @@
     renderChart();
   }
 
-  // ===== chart =====
   var chartSvg=$('chartSvg');
   function renderChart(){
-    var N = state.mode==='video' ? 12 : 10;
-    var buckets=state.buckets.slice(-N);
+    var N=state.mode==='video'?12:10, buckets=state.buckets.slice(-N);
     while(buckets.length<N) buckets=[{start:0,count:-1}].concat(buckets);
-    var max=Math.max(1, Math.max.apply(null,buckets.map(function(b){return b.count;})));
-    var w=300,h=110,padBottom=16,padTop=8, barW=w/buckets.length, parts=[];
+    var max=Math.max(1,Math.max.apply(null,buckets.map(function(b){ return b.count; })));
+    var w=300,h=110,padBottom=16,padTop=8,barW=w/buckets.length,parts=[];
     buckets.forEach(function(b,idx){
-      var empty=b.count<0, val=empty?0:b.count;
-      var barH=(val/max)*(h-padBottom-padTop), x=idx*barW+barW*0.18, bw=barW*0.64, y=h-padBottom-barH;
+      var empty=b.count<0, val=empty?0:b.count, barH=(val/max)*(h-padBottom-padTop);
+      var x=idx*barW+barW*0.18, bw=barW*0.64, y=h-padBottom-barH;
       parts.push('<rect class="bar'+(empty?' empty':'')+'" x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(barH,1.5).toFixed(1)+'" rx="2"></rect>');
       if(!empty&&val>0) parts.push('<text class="axis-label" x="'+(x+bw/2).toFixed(1)+'" y="'+(y-3).toFixed(1)+'" text-anchor="middle">'+val+'</text>');
-      var label='';
-      var showLabel = state.mode==='video' ? ((buckets.length-1-idx)%2===0) : true;
-      if(!empty && showLabel){
-        label = state.mode==='video' ? mmss(b.start)
-              : new Date(b.start).toLocaleTimeString('ko-KR',{hour12:false,hour:'2-digit',minute:'2-digit'}).slice(0,5);
-      }
+      var showLabel=state.mode==='video'?((buckets.length-1-idx)%2===0):true, label='';
+      if(!empty&&showLabel) label=state.mode==='video'?mmss(b.start):new Date(b.start).toLocaleTimeString('ko-KR',{hour12:false,hour:'2-digit',minute:'2-digit'}).slice(0,5);
       parts.push('<text class="axis-label" x="'+(x+bw/2).toFixed(1)+'" y="'+(h-3).toFixed(1)+'" text-anchor="middle">'+label+'</text>');
     });
     chartSvg.innerHTML=parts.join('');
-    chartNote.textContent = state.mode==='video' ? ('최근 '+N*10+'초') : '최근 10분';
+    chartNote.textContent=state.mode==='video'?('최근 '+N*10+'초'):'최근 10분';
   }
 
-  // ===== VIDEO MODE =====
-  videoInput.addEventListener('change', function(){
-    var f=videoInput.files && videoInput.files[0];
+  // ================= messages =================
+  var LEGEND='<div class="legend"><span><i style="background:#f0a63d"></i>추적 중</span><span><i style="background:#3dd68c"></i>카운트 완료</span></div>';
+  function showIdleMessage(){
+    camMsg.style.display='flex';
+    if(state.mode==='video'){
+      camMsgInner.innerHTML='휴대폰을 고정하고 라인을 <b>1~2분</b> 촬영한 뒤 불러오세요.<br>제품마다 점이 따라다니고, <b>주황 점선(카운트 라인)</b>을 넘으면 1개로 셉니다.'+LEGEND+
+        '<div class="msg-actions"><button class="action primary" id="pickVideoBtn" style="padding:11px 22px;">동영상 촬영 · 불러오기</button></div>';
+      $('pickVideoBtn').addEventListener('click',function(){ videoInput.click(); });
+    } else {
+      camMsgInner.innerHTML='휴대폰을 컨베이어 위에 고정하고 비춰주세요.<br>시작 후 1초 동안 배경(벨트)을 학습합니다.<br>제품마다 점이 따라다니고, <b>주황 점선</b>을 넘으면 1개로 셉니다.'+LEGEND+
+        '<div class="msg-actions"><button class="action primary" id="startCamBtn" style="padding:11px 22px;">카메라 시작</button></div>';
+      $('startCamBtn').addEventListener('click',startLive);
+    }
+  }
+  function showLiveError(err){
+    camMsg.style.display='flex';
+    var msg=err&&err.message?err.message:'', name=err&&err.name?err.name:'', why;
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)) why='이 화면(주소)에서는 브라우저가 카메라 기능을 제공하지 않습니다.';
+    else if(name==='NotAllowedError'||/denied/i.test(msg)){
+      why='카메라 권한이 거부됐습니다.<br><br><b>권한 팝업이 아예 안 떴다면</b>: 앱 안 미리보기 창, 카톡·메신저 링크, 다운로드한 파일로 연 경우입니다. 배포된 <b>https 주소를 Chrome·Safari에서 직접</b> 열어주세요.<br><b>예전에 \'차단\'을 누른 적이 있다면</b>: 주소창 왼쪽 아이콘 → 권한 → 카메라 → 허용.';
+    }
+    else if(name==='NotFoundError') why='사용할 수 있는 카메라를 찾지 못했습니다.';
+    else if(name==='NotReadableError') why='다른 앱이 카메라를 사용 중입니다. 카메라 앱을 종료하고 다시 시도하세요.';
+    else why='카메라를 열지 못했습니다.';
+    camMsgInner.innerHTML=why+(msg?'<span class="err">'+name+': '+msg+'</span>':'')+
+      '<div class="msg-actions"><button class="action primary" id="switchVideoBtn" style="padding:11px 22px;">동영상 분석으로 전환</button>'+
+      '<button class="action ghost" id="retryCamBtn" style="padding:9px 18px;">다시 시도</button></div>';
+    $('switchVideoBtn').addEventListener('click',function(){ setMode('video'); });
+    $('retryCamBtn').addEventListener('click',startLive);
+  }
+
+  // ================= mode switching =================
+  function setMode(mode){
+    stopEverything();
+    state.mode=mode;
+    $('tabVideo').classList.toggle('on',mode==='video');
+    $('tabLive').classList.toggle('on',mode==='live');
+    $('speedRow').hidden=mode!=='video';
+    flipBtn.hidden=mode!=='live';
+    if(mode==='video'){ subLabel.textContent='분석 구간'; subUnit.textContent='초'; chartTitle.textContent='구간별 생산량 (10초 단위)'; }
+    else { subLabel.textContent='최근 1분'; subUnit.textContent='개/분'; chartTitle.textContent='구간별 생산량 (1분 단위)'; }
+    pauseBtn.textContent='일시정지';
+    resetCounts();
+    setStatus('idle','대기 중');
+    showIdleMessage();
+    drawOverlay();
+  }
+  $('tabVideo').addEventListener('click',function(){ if(state.mode!=='video') setMode('video'); });
+  $('tabLive').addEventListener('click',function(){ if(state.mode!=='live') setMode('live'); });
+
+  function stopEverything(){
+    state.running=false; state.paused=false; state.finished=false;
+    if(rafId) cancelAnimationFrame(rafId); rafId=null;
+    if(vfcId&&video.cancelVideoFrameCallback){ try{ video.cancelVideoFrameCallback(vfcId); }catch(e){} } vfcId=null;
+    if(stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; }
+    try{ video.pause(); }catch(e){}
+    if(video.srcObject) video.srcObject=null;
+    if(video.getAttribute('src')){ try{ URL.revokeObjectURL(video.src); }catch(e){} video.removeAttribute('src'); video.load(); }
+    progress.hidden=true; progressBar.style.width='0';
+  }
+  function resetCounts(){
+    state.count=0; state.events=[]; state.buckets=[]; state.startedAt=null; state.processedMs=0;
+    resetTracker(); nextId=1; lastNote='';
+    countValue.textContent='0'; uphValue.textContent='0'; ppmValue.textContent='0'; intervalValue.textContent='--';
+    sessionClock.textContent=state.mode==='video'?'00:00 / 00:00':'00:00:00 경과';
+    renderChart();
+  }
+
+  // ================= video mode =================
+  videoInput.addEventListener('change',function(){
+    var f=videoInput.files&&videoInput.files[0];
     if(!f) return;
-    state.videoFile=f;
-    videoInput.value='';
+    state.videoFile=f; videoInput.value='';
     startVideoAnalysis();
   });
-
   function startVideoAnalysis(){
     if(!state.videoFile) return;
-    stopEverything();
-    resetCounts();
-    camMsg.style.display='none';
-    progress.hidden=false;
-    setStatus('live','영상 분석 중');
-    pauseBtn.textContent='일시정지';
-
-    video.classList.remove('mirror');
+    stopEverything(); resetCounts();
+    camMsg.style.display='none'; progress.hidden=false;
+    setStatus('live','영상 분석 중'); pauseBtn.textContent='일시정지';
     video.srcObject=null;
     video.src=URL.createObjectURL(state.videoFile);
     video.muted=true; video.playsInline=true;
-    video.playbackRate=parseFloat($('speedSelect').value)||2;
-
     video.onloadedmetadata=function(){
       state.videoDurationMs=isFinite(video.duration)?video.duration*1000:0;
       sessionClock.textContent='00:00 / '+mmss(state.videoDurationMs);
-      diagCanvas.width=sampleW; diagCanvas.height=sampleH;
+      state.vw=0; state.vh=0;                       // force processor + stage re-fit
+      video.playbackRate=parseFloat($('speedSelect').value)||1;
       state.running=true; state.finished=false;
+      loop();
       video.play().catch(function(err){
-        setStatus('idle','재생 실패');
+        state.running=false; setStatus('idle','재생 실패');
         camMsg.style.display='flex';
         camMsgInner.innerHTML='영상을 재생하지 못했습니다.<span class="err">'+(err&&err.message||'')+'</span><div class="msg-actions"><button class="action primary" id="pickVideoBtn2">다른 영상 선택</button></div>';
-        $('pickVideoBtn2').addEventListener('click',function(){videoInput.click();});
+        $('pickVideoBtn2').addEventListener('click',function(){ videoInput.click(); });
       });
-      scheduleVideoFrame();
     };
     video.onended=function(){
+      if(state.mode!=='video') return;
       state.running=false; state.finished=true;
       state.processedMs=state.videoDurationMs||state.processedMs;
       progressBar.style.width='100%';
+      sessionClock.textContent=mmss(state.processedMs)+' / '+mmss(state.videoDurationMs);
       updateMetrics();
       setStatus('done','분석 완료 · '+state.count+'개 / '+mmss(state.processedMs));
       pauseBtn.textContent='재분석';
       camMsg.style.display='flex';
-      camMsgInner.innerHTML='분석이 끝났습니다.<br><b>'+state.count+'개</b> 감지 · 시간당 <b>'+uphValue.textContent+'개</b>' +
-        '<div class="msg-actions">' +
-        '<button class="action primary" id="reanalyzeBtn" style="padding:11px 22px;">같은 영상 다시 분석</button>' +
-        '<button class="action ghost" id="pickVideoBtn3" style="padding:9px 18px;">다른 영상 불러오기</button>' +
-        '</div>';
-      $('reanalyzeBtn').addEventListener('click', startVideoAnalysis);
-      $('pickVideoBtn3').addEventListener('click', function(){ videoInput.click(); });
+      camMsgInner.innerHTML='분석이 끝났습니다.<br><b>'+state.count+'개</b> 카운트 · 시간당 <b>'+uphValue.textContent+'개</b><br><span style="font-size:12px;color:#aab6c2">결과가 이상하면 방향·라인 위치·민감도·크기를 바꾸고 다시 분석하세요.</span>'+
+        '<div class="msg-actions"><button class="action primary" id="reanalyzeBtn" style="padding:11px 22px;">같은 영상 다시 분석</button>'+
+        '<button class="action ghost" id="pickVideoBtn3" style="padding:9px 18px;">다른 영상 불러오기</button></div>';
+      $('reanalyzeBtn').addEventListener('click',startVideoAnalysis);
+      $('pickVideoBtn3').addEventListener('click',function(){ videoInput.click(); });
     };
     video.onerror=function(){
-      setStatus('idle','영상 오류');
+      if(state.mode!=='video'||!state.videoFile) return;
+      state.running=false; setStatus('idle','영상 오류');
       camMsg.style.display='flex';
       camMsgInner.innerHTML='이 영상 형식은 브라우저에서 재생할 수 없습니다.<div class="msg-actions"><button class="action primary" id="pickVideoBtn4">다른 영상 선택</button></div>';
-      $('pickVideoBtn4').addEventListener('click',function(){videoInput.click();});
+      $('pickVideoBtn4').addEventListener('click',function(){ videoInput.click(); });
     };
   }
 
-  function scheduleVideoFrame(){
-    if('requestVideoFrameCallback' in video){
-      vfcId=video.requestVideoFrameCallback(function(now, meta){
-        onVideoFrame(meta.mediaTime*1000);
-        if(state.running && !state.finished) scheduleVideoFrame();
-      });
-    } else {
-      rafId=requestAnimationFrame(function(){
-        onVideoFrame(video.currentTime*1000);
-        if(state.running && !state.finished) scheduleVideoFrame();
-      });
-    }
-  }
-  function onVideoFrame(mediaMs){
-    if(state.paused) return;
-    state.processedMs=mediaMs;
-    analyzeFrame(mediaMs, mediaMs);
-    if(state.videoDurationMs>0){
-      progressBar.style.width=Math.min(100,mediaMs/state.videoDurationMs*100).toFixed(1)+'%';
-      sessionClock.textContent=mmss(mediaMs)+' / '+mmss(state.videoDurationMs);
-    }
-  }
-
-  // ===== LIVE MODE =====
+  // ================= live mode =================
   function startLive(){
-    camMsg.style.display='flex';
-    camMsgInner.innerHTML='카메라를 여는 중입니다…';
-    if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){
-      showLiveError({name:'Unavailable', message:'navigator.mediaDevices 없음 (secure context 아님)'});
-      return;
-    }
+    camMsg.style.display='flex'; camMsgInner.innerHTML='카메라를 여는 중입니다…';
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){ showLiveError({name:'Unavailable',message:'navigator.mediaDevices 없음'}); return; }
     openCamera(state.facingMode).then(function(){
       camMsg.style.display='none';
-      diagCanvas.width=sampleW; diagCanvas.height=sampleH;
       resetCounts();
+      state.vw=0; state.vh=0;
       state.running=true; state.paused=false; state.startedAt=Date.now();
       setStatus('live','실시간 감지 중');
-      liveTick();
+      loop();
     }).catch(showLiveError);
   }
   function openCamera(facing){
     var constraints={audio:false, video:{facingMode:{ideal:facing}, width:{ideal:1280}, height:{ideal:960}}};
     return navigator.mediaDevices.getUserMedia(constraints).then(function(s){
-      if(stream) stream.getTracks().forEach(function(t){t.stop();});
-      stream=s;
-      video.removeAttribute('src'); video.srcObject=s;
-      video.classList.toggle('mirror', facing==='user');
+      if(stream) stream.getTracks().forEach(function(t){ t.stop(); });
+      stream=s; video.removeAttribute('src'); video.srcObject=s;
       return video.play();
     });
   }
-  function liveTick(){
-    rafId=requestAnimationFrame(liveTick);
-    if(state.paused||!state.running) return;
-    analyzeFrame(performance.now(), Date.now());
-  }
-  flipBtn.addEventListener('click', function(){
-    state.facingMode = state.facingMode==='environment'?'user':'environment';
-    if(stream) openCamera(state.facingMode).catch(function(){});
+  flipBtn.addEventListener('click',function(){
+    state.facingMode=state.facingMode==='environment'?'user':'environment';
+    if(stream) openCamera(state.facingMode).then(function(){ resetTracker(); }).catch(function(){});
   });
   setInterval(function(){
     if(state.mode!=='live'||!state.running||state.paused||!state.startedAt) return;
@@ -630,35 +750,46 @@
     updateMetrics();
   },1000);
 
-  // ===== controls =====
+  // ================= controls =================
   var sensLabels={1:'매우 낮음',2:'낮음',3:'낮음',4:'다소 낮음',5:'중간',6:'다소 높음',7:'높음',8:'높음',9:'매우 높음'};
-  $('sensSlider').addEventListener('input', function(e){ state.sensitivity=parseInt(e.target.value,10); $('sensHint').textContent=sensLabels[state.sensitivity]; });
-  $('roiSlider').addEventListener('input', function(e){
-    state.roiTop=parseInt(e.target.value,10)/100;
-    roiFrame.style.top=(state.roiTop*100)+'%';
-    $('roiHint').textContent=e.target.value+'%';
-    prevFrame=null;
+  var sizeLabels={1:'아주 작게',2:'작게',3:'작게',4:'보통',5:'보통',6:'크게',7:'크게',8:'아주 크게',9:'아주 크게'};
+  $('sensSlider').addEventListener('input',function(e){ state.sensitivity=parseInt(e.target.value,10); $('sensHint').textContent=sensLabels[state.sensitivity]; });
+  $('sizeSlider').addEventListener('input',function(e){ state.sizeLevel=parseInt(e.target.value,10); $('sizeHint').textContent=sizeLabels[state.sizeLevel]; });
+  $('sizeHint').textContent=sizeLabels[state.sizeLevel];
+  $('lineSlider').addEventListener('input',function(e){ state.linePos=parseInt(e.target.value,10)/100; $('lineHint').textContent=e.target.value+'%'; if(!state.running||state.paused) drawOverlay(); });
+  [].forEach.call(document.querySelectorAll('#dirSeg button'),function(btn){
+    btn.addEventListener('click',function(){
+      state.dir=btn.getAttribute('data-dir');
+      [].forEach.call(document.querySelectorAll('#dirSeg button'),function(b){ b.classList.toggle('on',b===btn); });
+      tracks.forEach(function(tr){ tr.px=tr.x; tr.py=tr.y; });
+      drawOverlay();
+    });
   });
-  $('cooldownSelect').addEventListener('change', function(e){ state.cooldownMs=parseInt(e.target.value,10); });
-  $('speedSelect').addEventListener('change', function(e){ if(state.mode==='video'&&video.src) video.playbackRate=parseFloat(e.target.value)||2; });
+  $('speedSelect').addEventListener('change',function(e){ if(state.mode==='video'&&video.getAttribute('src')) video.playbackRate=parseFloat(e.target.value)||1; });
+  $('maskBtn').addEventListener('click',function(e){
+    state.showMask=!state.showMask; maskView.hidden=!state.showMask;
+    e.currentTarget.classList.toggle('on',state.showMask); e.currentTarget.setAttribute('aria-pressed',state.showMask);
+    drawMask();
+  });
+  $('soundBtn').addEventListener('click',function(e){
+    state.soundOn=!state.soundOn; e.currentTarget.textContent=state.soundOn?'🔔':'🔕';
+    if(state.soundOn&&!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(err){} }
+  });
+  $('relearnBtn').addEventListener('click',function(){ resetTracker(); lastNote='배경 학습 중…'; drawOverlay(); });
 
-  $('plusBtn').addEventListener('click', function(){
-    var t = state.mode==='video' ? state.processedMs : Date.now();
-    registerPass(t);
-  });
-  $('minusBtn').addEventListener('click', function(){
-    if(state.count>0){
-      state.count--; var t=state.events.pop();
-      countValue.textContent=state.count.toLocaleString();
-      if(t!==undefined){
-        var bm=bucketMs(), start=Math.floor(t/bm)*bm;
-        for(var i=state.buckets.length-1;i>=0;i--){ if(state.buckets[i].start===start){ state.buckets[i].count--; if(state.buckets[i].count<=0) state.buckets.splice(i,1); break; } }
-      }
-      updateMetrics();
+  $('plusBtn').addEventListener('click',function(){ registerPass(state.mode==='video'?state.processedMs:Date.now()); });
+  $('minusBtn').addEventListener('click',function(){
+    if(state.count<=0) return;
+    state.count--; var t=state.events.pop();
+    countValue.textContent=state.count.toLocaleString();
+    if(t!==undefined){
+      var bm=bucketMs(), start=Math.floor(t/bm)*bm;
+      for(var i=state.buckets.length-1;i>=0;i--){ if(state.buckets[i].start===start){ state.buckets[i].count--; if(state.buckets[i].count<=0) state.buckets.splice(i,1); break; } }
     }
+    updateMetrics();
   });
 
-  pauseBtn.addEventListener('click', function(){
+  pauseBtn.addEventListener('click',function(){
     if(state.mode==='video'){
       if(state.finished){ startVideoAnalysis(); return; }
       if(!state.running) return;
@@ -669,79 +800,75 @@
       if(!state.running) return;
       state.paused=!state.paused;
       pauseBtn.textContent=state.paused?'재개':'일시정지';
-      setStatus(state.paused?'idle':'live', state.paused?'일시정지됨':'실시간 감지 중');
+      setStatus(state.paused?'idle':'live',state.paused?'일시정지됨':'실시간 감지 중');
     }
   });
-
-  $('resetBtn').addEventListener('click', function(){
-    if(state.count>0 && !confirm('카운트와 기록을 모두 초기화할까요?')) return;
-    if(state.mode==='video'){ stopEverything(); resetCounts(); setStatus('idle','대기 중'); showIdleMessage(); }
+  $('resetBtn').addEventListener('click',function(){
+    if(state.count>0&&!confirm('카운트와 기록을 모두 초기화할까요?')) return;
+    if(state.mode==='video'){ stopEverything(); resetCounts(); setStatus('idle','대기 중'); showIdleMessage(); drawOverlay(); }
     else { resetCounts(); if(state.running) state.startedAt=Date.now(); }
   });
 
-  // ===== export =====
+  // ================= export =================
   var downloadsApi=null;
-  if(window.claude && typeof window.claude.use==='function'){
+  if(window.claude&&typeof window.claude.use==='function'){
     window.claude.use('downloads').then(function(ns){ downloadsApi=ns; }).catch(function(){});
   }
-  function plainDownload(filename, text){
-    var blob=new Blob([text],{type:'text/csv;charset=utf-8'});
-    var url=URL.createObjectURL(blob), a=document.createElement('a');
+  function plainDownload(filename,text){
+    var blob=new Blob([text],{type:'text/csv;charset=utf-8'}), url=URL.createObjectURL(blob), a=document.createElement('a');
     a.href=url; a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    setTimeout(function(){ URL.revokeObjectURL(url); },1000);
   }
-  $('exportBtn').addEventListener('click', function(){
+  $('exportBtn').addEventListener('click',function(){
     if(state.events.length===0){ alert('내보낼 기록이 없습니다.'); return; }
-    var lines=['순번,시각,경과(초)'];
-    var t0=state.events[0];
+    var lines=['순번,시각,경과(초)'], t0=state.events[0];
     state.events.forEach(function(t,idx){
-      var stamp = state.mode==='video' ? (mmss(t)+'.'+Math.floor((t%1000)/100)) : new Date(t).toLocaleString('ko-KR');
-      var rel = state.mode==='video' ? (t/1000).toFixed(1) : ((t-t0)/1000).toFixed(1);
+      var stamp=state.mode==='video'?(mmss(t)+'.'+Math.floor((t%1000)/100)):new Date(t).toLocaleString('ko-KR');
+      var rel=state.mode==='video'?(t/1000).toFixed(1):((t-t0)/1000).toFixed(1);
       lines.push((idx+1)+','+stamp+','+rel);
     });
     lines.push('');
     lines.push('총 카운트,'+state.count);
     lines.push('시간당 생산량(UPH),'+uphValue.textContent.replace(/,/g,''));
     if(state.mode==='video') lines.push('분석 구간(초),'+(state.processedMs/1000).toFixed(1));
-    var csv='﻿'+lines.join('\n');
-    var name='line-speed-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.csv';
+    var csv='﻿'+lines.join('\n'), name='line-speed-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.csv';
     if(downloadsApi){
-      downloadsApi.save({filename:name, data:new Blob([csv],{type:'text/csv;charset=utf-8'})}).catch(function(err){
+      downloadsApi.save({filename:name,data:new Blob([csv],{type:'text/csv;charset=utf-8'})}).catch(function(err){
         if(err&&err.code==='declined') return;
         alert('저장하지 못했습니다: '+(err&&err.message||'알 수 없는 오류'));
       });
-    } else plainDownload(name, csv);
+    } else plainDownload(name,csv);
   });
 
-  function setStatus(mode, text){
-    statusPill.classList.toggle('live', mode==='live');
-    statusPill.classList.toggle('done', mode==='done');
+  function setStatus(mode,text){
+    statusPill.classList.toggle('live',mode==='live');
+    statusPill.classList.toggle('done',mode==='done');
     statusText.textContent=text;
   }
-
-  document.addEventListener('visibilitychange', function(){
+  document.addEventListener('visibilitychange',function(){
     if(state.mode!=='live'||!state.running) return;
     if(document.hidden) state.paused=true;
-    else if(pauseBtn.textContent==='일시정지') state.paused=false;
+    else if(pauseBtn.textContent==='일시정지'){ state.paused=false; resetTracker(); }
   });
 
-  // boot: hosted on a real https site (top-level page) → live camera works, start there.
-  // Inside a sandboxed frame or opened as a local file → camera is blocked, start with video analysis.
-  var inFrame = true;
-  try{ inFrame = window.top !== window.self; }catch(e){ inFrame = true; }
-  // In-app viewers (Claude app preview, KakaoTalk/메신저 in-app browsers) are WebViews that
-  // report https + top-level but never grant the camera — treat them as not live-capable.
-  var ua = navigator.userAgent || '';
-  var inAppView = /; wv\)|KAKAOTALK|NAVER\(inapp|Line\/|Instagram|FBAN|FBAV|Claude/i.test(ua);
-  var liveCapable = window.isSecureContext && !inFrame && !inAppView && location.protocol === 'https:' &&
-                    !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  setMode(liveCapable ? 'live' : 'video');
-  // Camera already blocked for this site → don't open on a dead end.
-  if(liveCapable && navigator.permissions && navigator.permissions.query){
+  // ================= boot =================
+  // Real https site opened top-level in Chrome/Safari → live camera works, start there.
+  // Sandboxed frames, in-app viewers (Claude app, KakaoTalk…) or local files → start with video analysis.
+  var inFrame=true;
+  try{ inFrame=window.top!==window.self; }catch(e){ inFrame=true; }
+  var ua=navigator.userAgent||'';
+  var inAppView=/; wv\)|KAKAOTALK|NAVER\(inapp|Line\/|Instagram|FBAN|FBAV|Claude/i.test(ua);
+  var liveCapable=window.isSecureContext&&!inFrame&&!inAppView&&location.protocol==='https:'&&
+                  !!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+  setMode(liveCapable?'live':'video');
+  if(liveCapable&&navigator.permissions&&navigator.permissions.query){
     navigator.permissions.query({name:'camera'}).then(function(st){
-      if(st.state === 'denied' && state.mode === 'live' && !state.running) setMode('video');
+      if(st.state==='denied'&&state.mode==='live'&&!state.running) setMode('video');
     }).catch(function(){});
   }
+
+  // test hook (harmless in production): lets automated checks read results
+  window.__lineSpeed={ state:state, get tracks(){ return tracks; } };
 })();
 </script>
 </body>
